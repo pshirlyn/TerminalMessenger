@@ -14,22 +14,23 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
     if(err) return console.error(err);
     api.listen(function callback(err, message) {
     	var sender, threadName;
-    	api.getUserInfo(message.senderID, function(err, ret) {
-    		if(err) return console.error(err);
+        if(message.isGroup == true) {
+            api.getUserInfo(message.senderID, function(err, ret) {
+            if(err) return console.error(err);
 
-    		//console.log(ret.firstName);
-    		//console.log(message.senderID, ret.name);
-            //output(message.senderID, ret.name);
-    	});
-    	api.getThreadInfo(message.threadID, function callback(err, info) {
-    		if(err) return console.error(err);
-    		if(info.name == null) {
-    			threadName = message.threadID;
-    		} else {
-    			threadName = info.name;
-                console.log(threadName, message.senderID, message.body);
-                output(message.threadID, message.senderID, message.body);
-    		}
-    	});
+            for(var user in ret) {
+                sender = ret[user].firstName;
+                api.getThreadInfo(message.threadID, function callback(err, info) {
+                 if(err) return console.error(err);
+                threadName = info.name;
+                   console.log(threadName, sender, message.body);
+                   output(threadName +" "+sender+" "+message.body);
+                
+                });
+                }
+             });
+        }
+    	
+    	
     }); 	
 });

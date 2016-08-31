@@ -2,9 +2,12 @@ var fs = require('fs');
 var login = require("facebook-chat-api");
 var config = require('./config');
 var util = require('util');
+var moment = require('moment');
+const notifier = require('node-notifier');
 
 
-var outputFile = fs.createWriteStream('fb.output', { flags: 'w' });
+
+var outputFile = fs.createWriteStream('fb.out', { flags: 'w' });
 
 output = function (d) { //
     outputFile.write(util.format(d) + '\n');
@@ -21,14 +24,23 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
             for(var user in ret) {
                 sender = ret[user].firstName;
                 api.getThreadInfo(message.threadID, function callback(err, info) {
-                 if(err) return console.error(err);
-                threadName = info.name;
-                   console.log(threadName, sender, message.body);
-                   output(threadName +" "+sender+" "+message.body);
-                
-                });
+                    if(err) return console.error(err);
+                    threadName = info.name;
+                       console.log(threadName, sender, message.body);
+
+                       output(moment().format('hh:mm:ss a')+" "+sender +" to "+threadName+": "+message.body);
+                        notifier.notify('message text');
+                    });
                 }
              });
+        } else {
+            api.getThreadInfo(message.threadID, function callback(err, info) {
+                 if(err) return console.error(err);
+                threadName = info.name;
+                   console.log(threadName, message.body);
+                   output(moment().format('hh:mm:ss a')+" "+threadName+": "+message.body);
+                   notifier.notify('sample');
+                });
         }
     	
     	

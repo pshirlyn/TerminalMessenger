@@ -5,7 +5,8 @@ var util = require('util');
 var moment = require('moment');
 const notifier = require('node-notifier');
 
-
+var troll1 = 1100218930048812;
+var troll2 = 100002389267103;
 
 var outputFile = fs.createWriteStream('fb.out', { flags: 'w' });
 
@@ -15,6 +16,23 @@ output = function (d) { //
 
 login({email: config.useraccount.email, password: config.useraccount.password}, function callback (err, api) {
     if(err) return console.error(err);
+
+    var chatID = troll1;
+    //async function monitoring input and sending to hardcoded chat 
+    process.stdin.setEncoding('utf8');
+
+    process.stdin.on('readable', () => {
+        var chunk = process.stdin.read();
+        if (chunk !== null) {
+            var msg = {body: chunk};
+            api.sendMessage(msg, chatID);
+        }
+    });
+    process.stdin.on('end', () => {
+        process.stdout.write('end');
+    });
+
+    //logging chats in console
     api.listen(function callback(err, message) {
     	var sender, threadName;
         if(message.isGroup == true) {
@@ -29,7 +47,7 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
                        console.log(threadName, sender, message.body);
 
                        output(moment().format('hh:mm:ss a')+" "+sender +" to "+threadName+": "+message.body);
-                        notifier.notify('message text');
+                        //notifier.notify("Alert");
                     });
                 }
              });

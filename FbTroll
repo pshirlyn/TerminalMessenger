@@ -1,6 +1,7 @@
 var fs = require('fs');
 var login = require("facebook-chat-api");
 var config = require('./config');
+var config2 = require('./config2');
 var util = require('util');
 var moment = require('moment');
 const notifier = require('node-notifier');
@@ -17,7 +18,7 @@ output = function (d) { //
 login({email: config.useraccount.email, password: config.useraccount.password}, function callback (err, api) {
     if(err) return console.error(err);
 
-    var chatID = troll1;
+    var chatID = troll2;
     //async function monitoring input and sending to hardcoded chat 
     process.stdin.setEncoding('utf8');
 
@@ -35,7 +36,7 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
     //logging chats in console
     api.listen(function callback(err, message) {
     	var sender, threadName;
-        if(message.isGroup == true) {
+        //if(message.isGroup == true) {
             api.getUserInfo(message.senderID, function(err, ret) {
             if(err) return console.error(err);
 
@@ -43,7 +44,7 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
                 sender = ret[user].firstName;
                 api.getThreadInfo(message.threadID, function callback(err, info) {
                     if(err) return console.error(err);
-                    threadName = info.name;
+                        threadName = info.name;
                        console.log(threadName, sender, message.body);
 
                        output(moment().format('hh:mm:ss a')+" "+sender +" to "+threadName+": "+message.body);
@@ -51,16 +52,47 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
                     });
                 }
              });
+            /*
         } else {
             api.getThreadInfo(message.threadID, function callback(err, info) {
                  if(err) return console.error(err);
-                threadName = info.name;
-                   console.log(threadName, message.body);
+                    threadName = info.name;
+                   //console.log(threadName, message.body);
                    output(moment().format('hh:mm:ss a')+" "+threadName+": "+message.body);
                    notifier.notify('sample');
                 });
-        }
+        }*/
     	
     	
     }); 	
 });
+
+/*
+login({email: config2.useraccount.email, password: config2.useraccount.password}, function callback (err, api) {
+    if(err) return console.error(err);
+
+    var chatID = troll2;
+
+    //logging chats in console
+    api.listen(function callback(err, message) {
+    	var sender, threadName;
+        //if(message.isGroup == true) {
+            api.getUserInfo(message.senderID, function(err, ret) {
+            if(err) return console.error(err);
+
+            for(var user in ret) {
+                sender = ret[user].firstName;
+                api.getThreadInfo(message.threadID, function callback(err, info) {
+                    if(err) return console.error(err);
+                        threadName = info.name;
+                       console.log(threadName, sender, message.body);
+
+                       output(moment().format('hh:mm:ss a')+" "+sender +" to "+threadName+": "+message.body);
+                        //notifier.notify("Alert");
+                    });
+                }
+             });
+    	
+    }); 	
+});
+*/

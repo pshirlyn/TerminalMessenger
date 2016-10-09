@@ -18,7 +18,15 @@ output = function (d) { //
 login({email: config.useraccount.email, password: config.useraccount.password}, function callback (err, api) {
     if(err) return console.error(err);
 
+    api.setOptions({
+      selfListen: true,
+      logLevel: "silent",
+      listenEvents: true
+    });
+
     var chatID = troll2;
+
+    /*
     //async function monitoring input and sending to hardcoded chat 
     process.stdin.setEncoding('utf8');
 
@@ -32,11 +40,13 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
     process.stdin.on('end', () => {
         process.stdout.write('end');
     });
+    */
 
     //logging chats in console
     api.listen(function callback(err, message) {
-    	var sender, threadName;
-        //if(message.isGroup == true) {
+    	if(message.type == "message") {
+    		var sender, threadName;
+        	//if(message.isGroup == true) {
             api.getUserInfo(message.senderID, function(err, ret) {
             if(err) return console.error(err);
 
@@ -52,6 +62,17 @@ login({email: config.useraccount.email, password: config.useraccount.password}, 
                     });
                 }
              });
+    	} else if(message.type == "event") {
+    		var cortnie = 100011850334536;
+    		if(message.logMessageData.message_type == "change_thread_nickname") {
+    				if(message.logMessageData.untypedData.participant_id == cortnie) {
+    					api.changeNickname("HC Queen", message.threadID, cortnie, function callback(err, api) {
+    					 if(err) return console.error(err);
+    					});
+    				}
+    		}
+    	}
+    		
             /*
         } else {
             api.getThreadInfo(message.threadID, function callback(err, info) {
